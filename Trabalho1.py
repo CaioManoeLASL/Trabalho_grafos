@@ -77,3 +77,46 @@ print("\nMatriz de Incidência:\n")
 for i in range(n):
     linha = " ".join(str(x) for x in matriz_inc[i])
     print(f"{estados[i]}  {linha}")
+
+# PARTE C: Graus máximo e mínimo
+
+graus_lista = {estado: len(vizinhos) for estado, vizinhos in grafo.items()}
+graus_matriz_adj = {estados[i]: sum(matriz_adj[i]) for i in range(n)}
+graus_matriz_inc = {estados[i]: sum(matriz_inc[i]) for i in range(n)}
+
+def analisar_extremos(dicionario_graus, nome_rep):
+    val_max = max(dicionario_graus.values())
+    val_min = min(dicionario_graus.values())
+    
+    est_max = [est for est, g in dicionario_graus.items() if g == val_max]
+    est_min = [est for est, g in dicionario_graus.items() if g == val_min]
+    
+    print(f"\n--- Representação: {nome_rep} ---")
+    print(f"Grau Máximo: {val_max} ({', '.join(est_max)})")
+    print(f"Grau Mínimo: {val_min} ({', '.join(est_min)})")
+    
+# PARTE C: Listar vizinhos dos graus máximo e mínimo
+
+    print("\nVizinhos - Grau Máximo:")
+    for est in est_max:
+        print(f"  {est}: {', '.join(grafo[est])}")
+        
+    print("Vizinhos - Grau Mínimo:")
+    for est in est_min:
+        print(f"  {est}: {', '.join(grafo[est])}")
+
+analisar_extremos(graus_lista, "Lista Indexada")
+analisar_extremos(graus_matriz_adj, "Matriz de Adjacência")
+analisar_extremos(graus_matriz_inc, "Matriz de Incidência")
+
+# PARTE C: Frequência dos graus e histograma
+
+print("\nHISTOGRAMA DE FREQUÊNCIA")
+
+todos_os_graus = list(graus_lista.values())
+faixa_de_graus = range(min(todos_os_graus), max(todos_os_graus) + 1)
+
+for g in faixa_de_graus:
+    quantidade = todos_os_graus.count(g)
+    barra = "*" * quantidade
+    print(f"Grau {g}: {quantidade} estado(s) {barra}")
