@@ -1,3 +1,8 @@
+import streamlit as st
+import plotly.express as px
+import pandas as pd
+import requests
+
 #Lista indexada
 grafo = {
     "AC": ["AM", "RO"],
@@ -120,3 +125,55 @@ for g in faixa_de_graus:
     quantidade = todos_os_graus.count(g)
     barra = "*" * quantidade
     print(f"Grau {g}: {quantidade} estado(s) {barra}")
+
+# Tabralho 2
+
+cores = ["red", "blue", "green", "yellow"]
+
+coloracao = {}
+
+ordenados = sorted(grafo, key=lambda x: len(grafo[x]), reverse=True)
+
+for estado in ordenados:
+
+    cores_usadas = {coloracao[v] for v in grafo[estado] if v in coloracao}
+
+    for cor in cores:
+        if cor not in cores_usadas:
+            coloracao[estado] = cor
+            break
+
+df = pd.DataFrame({
+    "sigla": list(coloracao.keys()),
+    "cor": list(coloracao.values())
+})
+
+url = "https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson"
+geojson = requests.get(url).json()
+
+st.title("Coloração das Unidades da Federação")
+st.write("Algoritmo Guloso baseado no Teorema das 4 Cores")
+
+fig = px.choropleth(
+    df,
+    geojson=geojson,
+    locations="sigla",
+    featureidkey="properties.sigla",
+    color="cor",
+    color_discrete_map={
+        "red": "red",
+        "blue": "blue",
+        "green": "green",
+        "yellow": "yellow"
+    },
+    scope="south america"
+)
+
+fig.update_traces(marker_line_width=0.5, marker_line_color="black")
+
+st.plotly_chart(fig)
+
+for estado in grafo:
+    for vizinho in grafo[estado]:
+        if coloracao[estado] == coloracao[vizinho]:
+            print("Erro:", estado, vizinho)
